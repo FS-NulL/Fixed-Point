@@ -1,9 +1,11 @@
 #ifndef __FIXED_POINT__47598035
 #define __FIXED_POINT__47598035
 
+#include <cstddef> // for size_t
+
 namespace FixedPoint
 {
-	template <size_t dps> struct Fixed;
+	template <size_t dps,typename MyType = long long int> struct Fixed;
 
 	namespace details
 	{
@@ -167,10 +169,10 @@ namespace FixedPoint
 
 	}
 
-	template <size_t dps>
+	template <size_t dps, typename MyType>
 	struct Fixed
 	{
-		typedef long long int MyType;
+		//typedef long long int MyType;
 		MyType m_Value;
 
 		// Constructors
@@ -200,22 +202,22 @@ namespace FixedPoint
 		}
 
 		// Mathematical operators
-		Fixed<dps> operator +(const Fixed<dps>& d)
+		inline Fixed<dps> operator +(const Fixed<dps>& d)
 		{
 			return (m_Value + d.m_Value);
 		}
-		Fixed<dps> operator -(const Fixed<dps>& d)
+		inline Fixed<dps> operator -(const Fixed<dps>& d)
 		{
 			return (m_Value - d.m_Value);
 		}
 
 		template<size_t dps2>
-		Fixed<(dps > dps2 ? dps : dps2)>  operator +(const Fixed<dps2> d)
+		inline Fixed<(dps > dps2 ? dps : dps2)>  operator +(const Fixed<dps2> d)
 		{
 			return details::ops::add(*this, d);       
 		}
 		template<size_t dps2>
-		Fixed<(dps > dps2 ? dps : dps2)>  operator -(const Fixed<dps2> d)
+		inline Fixed<(dps > dps2 ? dps : dps2)>  operator -(const Fixed<dps2> d)
 		{
 			return details::ops::sub(*this, d);      
 		}
@@ -234,7 +236,8 @@ namespace FixedPoint
 			const auto max = details::Max<dps, dps2>::value;
 
 			// convert numerator to (2*max)+1
-			Fixed<2 * max + 1> num = *this; // TODO: These Fixeds can just be long long ints
+			// Force this to use a wide value to avoid overflows
+			Fixed<2 * max + 1, long long int> num = *this; 
 
 			// convert denum to max
 			Fixed<max> denum = d;
@@ -250,41 +253,41 @@ namespace FixedPoint
 
 			return denum; // return denum so the return type is correct and doesn't force a conversion
 		}
-		bool operator ==(const Fixed<dps>& d) const
+		inline bool operator ==(const Fixed<dps>& d) const
 		{
 			return m_Value == d.m_Value;
 		}
 		template<size_t dps2>
-		bool operator ==(const Fixed<dps2>& d) const
+		inline bool operator ==(const Fixed<dps2>& d) const
 		{
 			return details::ops::equal(*this, d);
 		}
 
-		Fixed<dps> operator *(const int v) { return m_Value * v; }
+		inline Fixed<dps> operator *(const int v) { return m_Value * v; }
 		Fixed<dps> operator /(const int v)
 		{
 			auto temp = ((m_Value * 10) / v);
 			if (temp >= 0) temp += 5; else temp -= 5;
 			return temp / 10;
 		}
-		Fixed<dps> operator +(const int v)
+		inline Fixed<dps> operator +(const int v)
 		{
 			return m_Value + v * details::Factor<dps>::value;
 		}
-		Fixed<dps> operator -(const int v)
+		inline Fixed<dps> operator -(const int v)
 		{
 			return m_Value - v * details::Factor<dps>::value;
 		}
 
-		Fixed<dps> operator +=(const int v)
+		inline Fixed<dps> operator +=(const int v)
 		{
 			m_Value += v * details::Factor<dps>::value; return *this;
 		}
-		Fixed<dps> operator -=(const int v)
+		inline Fixed<dps> operator -=(const int v)
 		{
 			m_Value -= v * details::Factor<dps>::value; return *this;
 		}
-		Fixed<dps> operator *=(const int v) { m_Value *= v; return *this; }
+		inline Fixed<dps> operator *=(const int v) { m_Value *= v; return *this; }
 		Fixed<dps> operator /=(const int v)
 		{
 			auto temp = ((m_Value * 10) / v);
@@ -293,10 +296,10 @@ namespace FixedPoint
 			return *this;
 		}
 
-		Fixed<dps> operator +=(const Fixed<dps>& d) { m_Value += d.m_Value; return *this; }
-		Fixed<dps> operator -=(const Fixed<dps>& d) { m_Value -= d.m_Value; return *this; }
-		Fixed<dps> operator *=(const Fixed<dps>& d) { return *this = *this * d; }
-		Fixed<dps> operator /=(const Fixed<dps>& d) { return *this = *this / d; }
+		inline Fixed<dps> operator +=(const Fixed<dps>& d) { m_Value += d.m_Value; return *this; }
+		inline Fixed<dps> operator -=(const Fixed<dps>& d) { m_Value -= d.m_Value; return *this; }
+		inline Fixed<dps> operator *=(const Fixed<dps>& d) { return *this = *this * d; }
+		inline Fixed<dps> operator /=(const Fixed<dps>& d) { return *this = *this / d; }
 
 		template <size_t dps2>
 		Fixed<dps> operator +=(const Fixed<dps>& d)
@@ -322,10 +325,10 @@ namespace FixedPoint
 		}
 
 		// Comparisons
-		bool operator > (const Fixed<dps>& d) { return m_Value > d.m_Value; }
-		bool operator < (const Fixed<dps>& d) { return m_Value < d.m_Value; }
-		bool operator >=(const Fixed<dps>& d) { return !(m_Value < d.m_Value); }
-		bool operator <=(const Fixed<dps>& d) { return !(m_Value > d.m_Value); }
+		inline bool operator > (const Fixed<dps>& d) { return m_Value > d.m_Value; }
+		inline bool operator < (const Fixed<dps>& d) { return m_Value < d.m_Value; }
+		inline bool operator >=(const Fixed<dps>& d) { return !(m_Value < d.m_Value); }
+		inline bool operator <=(const Fixed<dps>& d) { return !(m_Value > d.m_Value); }
 
 		template<size_t dps2>
 		bool operator >(const Fixed<dps2>& d)
@@ -350,6 +353,33 @@ namespace FixedPoint
 			else m_Value += (factor / 2);
 			m_Value /= factor;
 			m_Value *= factor;
+		}
+
+		// Set the integral part, clears the fractional component
+		void set_integral(MyType value)
+		{
+			m_Value = details::Factor<dps>::value * value;
+		}
+
+		// Sets the integral part, keeps the fractional component
+		void append_integral(MyType value)
+		{
+			m_Value = (m_Value % details::Factor<dps>::value) +
+				details::Factor<dps>::value * value;
+		}
+
+		// Sets the fractional part, clears the integral component
+		void set_fractional(MyType value)
+		{
+			m_Value = value % details::Factor<dps>::value;
+		}
+
+		// Sets the fractional part, keeps the integral component
+		void append_fractional(MyType value)
+		{			
+			m_Value = (m_Value / details::Factor<dps>::value)
+				* details::Factor<dps>::value 
+				+ value % details::Factor<dps>::value;
 		}
 
 	};

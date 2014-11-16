@@ -382,7 +382,31 @@ namespace FixedPoint
 				+ value % details::Factor<dps>::value;
 		}
 
+		inline MyType get_integral()
+		{
+			return m_Value / details::Factor<dps>::value;
+		}
+
+		inline MyType get_fractional()
+		{
+			return m_Value % details::Factor<dps>::value;
+		}
+
 	};
+
+	template<typename Stream, size_t N, typename intfmt>
+	Stream& operator<<(Stream& s, Fixed<N, intfmt>& value)
+	{
+		auto fillch = s.fill();
+		auto width = s.width();
+		s << value.get_integral() << ".";
+		s.fill('0');
+		s.width(N);
+		s << value.get_fractional();
+		s.width(width);
+		s.fill(fillch);
+		return s;
+	}
 
 }
 

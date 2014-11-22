@@ -348,7 +348,8 @@ namespace FixedPoint
 		template<int decimalPlaces>
 		void round()
 		{
-			auto factor = details::Factor<dps - decimalPlaces>::value;
+			const auto factor = 
+				details::Factor<static_cast<int>(dps) - decimalPlaces>::value;
 			if (m_Value < 0) m_Value -= (factor / 2);
 			else m_Value += (factor / 2);
 			m_Value /= factor;
@@ -390,6 +391,11 @@ namespace FixedPoint
 		inline MyType get_fractional()
 		{
 			return m_Value % details::Factor<dps>::value;
+		}
+
+		inline size_t get_dp()
+		{
+			return dps;
 		}
 
 	};

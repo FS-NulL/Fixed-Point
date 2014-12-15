@@ -38,7 +38,7 @@ namespace FixedPoint
 				}
 			};
 
-			template<size_t dps1, size_t dps2>
+			template <size_t dps1, size_t dps2>
 			inline void scaleFixed(Fixed<dps1>& a, const Fixed<dps2>& b) {
 				//a.m_Value = 0;
 				scaleFixedImpl<dps1, dps2, (dps1 >= dps2)>::f(a, b);
@@ -64,7 +64,7 @@ namespace FixedPoint
 				}
 			};
 
-			template<size_t dps1, size_t dps2>
+			template <size_t dps1, size_t dps2>
 			inline Fixed<(dps1 > dps2 ? dps1 : dps2)>
 				add(const Fixed<dps1>& a, const Fixed<dps2>& b) {
 				return addImpl<dps1, dps2, (dps1 > dps2)>::f(a, b);
@@ -87,7 +87,7 @@ namespace FixedPoint
 				}
 			};
 
-			template<size_t dps1, size_t dps2>
+			template <size_t dps1, size_t dps2>
 			inline Fixed<(dps1 > dps2 ? dps1 : dps2)>
 				sub(Fixed<dps1>& a, const Fixed<dps2>& b) {
 				return subImpl<dps1, dps2, (dps1 > dps2)>::f(a, b);
@@ -112,7 +112,7 @@ namespace FixedPoint
 				}
 			};
 
-			template<size_t dps1, size_t dps2>
+			template <size_t dps1, size_t dps2>
 			inline bool equal(const Fixed<dps1>& a, const Fixed<dps2>& b) {
 				return eqImpl<dps1, dps2, (dps1 > dps2)>::f(a, b);
 			}
@@ -136,7 +136,7 @@ namespace FixedPoint
 				}
 			};
 
-			template<size_t dps1, size_t dps2>
+			template <size_t dps1, size_t dps2>
 			inline bool greater(const Fixed<dps1>& a, const Fixed<dps2>& b) {
 				return gtImpl<dps1, dps2, (dps1 > dps2)>::f(a, b);
 			}
@@ -161,7 +161,7 @@ namespace FixedPoint
 				}
 			};
 
-			template<size_t dps1, size_t dps2>
+			template <size_t dps1, size_t dps2>
 			inline bool lesser(const Fixed<dps1>& a, const Fixed<dps2>& b) {
 				return ltImpl<dps1, dps2, (dps1 > dps2)>::f(a, b);
 			}
@@ -193,9 +193,10 @@ namespace FixedPoint
 			m_Value = static_cast<MyType>(f);
 		}
 
+		Fixed() : m_Value(0) { }
 		Fixed(MyType v) : m_Value(v/**details::Factor<dps>::value*/) { }
 		Fixed(const Fixed<dps>& d) { m_Value = d.m_Value; }
-		template<size_t dps2> Fixed(const Fixed<dps2>& d)
+		template <size_t dps2> Fixed(const Fixed<dps2>& d)
 		{
 			// Convert to our dps format
 			details::ctors::scaleFixed(*this, d);
@@ -211,17 +212,17 @@ namespace FixedPoint
 			return (m_Value - d.m_Value);
 		}
 
-		template<size_t dps2>
+		template <size_t dps2>
 		inline Fixed<(dps > dps2 ? dps : dps2)>  operator +(const Fixed<dps2> d)
 		{
 			return details::ops::add(*this, d);       
 		}
-		template<size_t dps2>
+		template <size_t dps2>
 		inline Fixed<(dps > dps2 ? dps : dps2)>  operator -(const Fixed<dps2> d)
 		{
 			return details::ops::sub(*this, d);      
 		}
-		template<size_t dps2>
+		template <size_t dps2>
 		Fixed<(dps > dps2 ? dps : dps2)>  operator *(const Fixed<dps2> d)
 		{
 			auto temp = m_Value * d.m_Value;
@@ -229,7 +230,7 @@ namespace FixedPoint
 			if (temp >= 0) temp += f / 2; else temp -= f / 2;
 			return temp / f;
 		}
-		template<size_t dps2>
+		template <size_t dps2>
 		Fixed<(dps > dps2 ? dps : dps2)>  operator /(const Fixed<dps2> d)
 		{
 			// find max dps       
@@ -257,7 +258,7 @@ namespace FixedPoint
 		{
 			return m_Value == d.m_Value;
 		}
-		template<size_t dps2>
+		template <size_t dps2>
 		inline bool operator ==(const Fixed<dps2>& d) const
 		{
 			return details::ops::equal(*this, d);
@@ -330,22 +331,22 @@ namespace FixedPoint
 		inline bool operator >=(const Fixed<dps>& d) { return !(m_Value < d.m_Value); }
 		inline bool operator <=(const Fixed<dps>& d) { return !(m_Value > d.m_Value); }
 
-		template<size_t dps2>
+		template <size_t dps2>
 		bool operator >(const Fixed<dps2>& d)
 		{
 			return details::ops::greater(*this, d);
 		}
-		template<size_t dps2>
+		template <size_t dps2>
 		bool operator < (const Fixed<dps2>& d)
 		{
 			return details::ops::lesser(*this, d);
 		}
-		template<size_t dps2>
+		template <size_t dps2>
 		bool operator <=(const Fixed<dps2>& d) { return !(*this > d); }
-		template<size_t dps2>
+		template <size_t dps2>
 		bool operator >=(const Fixed<dps2>& d) { return !(*this < d); }
 
-		template<int decimalPlaces>
+		template <int decimalPlaces>
 		void round()
 		{
 			const auto factor = 
@@ -357,26 +358,26 @@ namespace FixedPoint
 		}
 
 		// Set the integral part, clears the fractional component
-		void set_integral(MyType value)
+		inline void set_integral(MyType value)
 		{
 			m_Value = details::Factor<dps>::value * value;
 		}
 
 		// Sets the integral part, keeps the fractional component
-		void append_integral(MyType value)
+		inline void append_integral(MyType value)
 		{
 			m_Value = (m_Value % details::Factor<dps>::value) +
 				details::Factor<dps>::value * value;
 		}
 
 		// Sets the fractional part, clears the integral component
-		void set_fractional(MyType value)
+		inline void set_fractional(MyType value)
 		{
 			m_Value = value % details::Factor<dps>::value;
 		}
 
 		// Sets the fractional part, keeps the integral component
-		void append_fractional(MyType value)
+		inline void append_fractional(MyType value)
 		{			
 			m_Value = (m_Value / details::Factor<dps>::value)
 				* details::Factor<dps>::value 
@@ -400,7 +401,7 @@ namespace FixedPoint
 
 	};
 
-	template<typename Stream, size_t N, typename intfmt>
+	template <typename Stream, size_t N, typename intfmt>
 	Stream& operator<<(Stream& s, Fixed<N, intfmt>& value)
 	{
 		auto fillch = s.fill();

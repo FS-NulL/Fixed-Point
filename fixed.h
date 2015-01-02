@@ -2,6 +2,7 @@
 #define __FIXED_POINT__47598035
 
 #include <cstddef> // for size_t
+#include <iosfwd>
 
 namespace FixedPoint
 {
@@ -400,9 +401,9 @@ namespace FixedPoint
 		}
 
 	};
-#if 0
-	template <typename Stream, size_t N, typename intfmt>
-	Stream& operator<<(Stream& s, Fixed<N, intfmt>& value)
+
+	template <size_t N, typename intfmt>
+	std::ostream& operator<<(std::ostream& s, Fixed<N, intfmt>& value)
 	{
 		auto fillch = s.fill();
 		auto width = s.width();
@@ -414,7 +415,7 @@ namespace FixedPoint
 		s.fill(fillch);
 		return s;
 	}
-#endif
+
 
 }
 

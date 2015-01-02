@@ -194,7 +194,7 @@ namespace FixedPoint
 		}
 
 		Fixed() : m_Value(0) { }
-		Fixed(MyType v) : m_Value(v/**details::Factor<dps>::value*/) { }
+		Fixed(MyType v) : m_Value(v) { } // Required to be like this
 		Fixed(const Fixed<dps>& d) { m_Value = d.m_Value; }
 		template <size_t dps2> Fixed(const Fixed<dps2>& d)
 		{
@@ -400,7 +400,7 @@ namespace FixedPoint
 		}
 
 	};
-
+#if 0
 	template <typename Stream, size_t N, typename intfmt>
 	Stream& operator<<(Stream& s, Fixed<N, intfmt>& value)
 	{
@@ -414,6 +414,7 @@ namespace FixedPoint
 		s.fill(fillch);
 		return s;
 	}
+#endif
 
 }
 

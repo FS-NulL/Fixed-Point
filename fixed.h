@@ -327,25 +327,25 @@ namespace FixedPoint
 		}
 
 		// Comparisons
-		inline bool operator > (const Fixed<dps>& d) { return m_Value > d.m_Value; }
-		inline bool operator < (const Fixed<dps>& d) { return m_Value < d.m_Value; }
-		inline bool operator >=(const Fixed<dps>& d) { return !(m_Value < d.m_Value); }
-		inline bool operator <=(const Fixed<dps>& d) { return !(m_Value > d.m_Value); }
+		inline bool operator > (const Fixed<dps>& d) const { return m_Value > d.m_Value; }
+		inline bool operator < (const Fixed<dps>& d) const { return m_Value < d.m_Value; }
+		inline bool operator >=(const Fixed<dps>& d) const { return !(m_Value < d.m_Value); }
+		inline bool operator <=(const Fixed<dps>& d) const { return !(m_Value > d.m_Value); }
 
 		template <size_t dps2>
-		bool operator >(const Fixed<dps2>& d)
+		bool operator >(const Fixed<dps2>& d) const
 		{
 			return details::ops::greater(*this, d);
 		}
 		template <size_t dps2>
-		bool operator < (const Fixed<dps2>& d)
+		bool operator < (const Fixed<dps2>& d) const
 		{
 			return details::ops::lesser(*this, d);
 		}
 		template <size_t dps2>
-		bool operator <=(const Fixed<dps2>& d) { return !(*this > d); }
+		bool operator <=(const Fixed<dps2>& d) const { return !(*this > d); }
 		template <size_t dps2>
-		bool operator >=(const Fixed<dps2>& d) { return !(*this < d); }
+		bool operator >=(const Fixed<dps2>& d) const { return !(*this < d); }
 
 		template <int decimalPlaces>
 		void round()
@@ -385,17 +385,17 @@ namespace FixedPoint
 				+ value % details::Factor<dps>::value;
 		}
 
-		inline MyType get_integral()
+		inline MyType get_integral() const
 		{
 			return m_Value / details::Factor<dps>::value;
 		}
 
-		inline MyType get_fractional()
+		inline MyType get_fractional() const
 		{
 			return m_Value % details::Factor<dps>::value;
 		}
 
-		inline size_t get_dp()
+		inline size_t get_dp() const
 		{
 			return dps;
 		}

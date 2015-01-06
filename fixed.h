@@ -170,8 +170,10 @@ namespace FixedPoint
 
 	}
 
+	struct FixedBase {};
+
 	template <size_t dps, typename MyType>
-	struct Fixed
+	struct Fixed : FixedBase
 	{
 		//typedef long long int MyType;
 		MyType m_Value;

@@ -14,6 +14,15 @@ namespace FixedPoint
 		template<int N> struct Factor	 { enum { value = (Factor<N - 1>::value * 10) }; };
 		template<>		struct Factor< 0>{ enum { value = 1 }; };
 
+		int RTFactor(int dp)
+		{
+			int temp = 1;
+			while (dp-- > 0) {
+				temp *= 10;
+			}
+			return temp;
+		}
+
 		template<size_t a, size_t b> struct Max{ enum { value = (a>b ? a : b) }; };
 
 		namespace ctors
@@ -170,10 +179,8 @@ namespace FixedPoint
 
 	}
 
-	struct FixedBase {};
-
 	template <size_t dps, typename MyType>
-	struct Fixed : FixedBase
+	struct Fixed
 	{
 		//typedef long long int MyType;
 		MyType m_Value;
@@ -405,13 +412,50 @@ namespace FixedPoint
 	};
 
 	template <size_t N, typename intfmt>
-	std::ostream& operator<<(std::ostream& s, Fixed<N, intfmt>& value)
+	std::ostream& operator<<(std::ostream& s, const Fixed<N, intfmt>& value)
 	{
 		auto fillch = s.fill();
 		auto width = s.width();
 		s << value.get_integral() << ".";
 		s.fill('0');
 		s.width(N);
+		s << value.get_fractional();
+		s.width(width);
+		s.fill(fillch);
+		return s;
+	}
+
+	template<typename MyType = long long int>
+	struct RTFixed
+	{
+		MyType m_Value;
+		int m_dps;
+
+		template<size_t N>
+		RTFixed(Fixed<N, MyType>& f)
+			: m_Value(f.m_Value)
+			, m_dps(f.get_dp())
+		{ }
+
+		inline MyType get_integral() const
+		{
+			return m_Value / details::RTFactor(m_dps);
+		}
+
+		inline MyType get_fractional() const
+		{
+			return m_Value % details::RTFactor(m_dps);
+		}
+	};
+
+	template <typename T>
+	std::ostream& operator<<(std::ostream& s, const RTFixed<T>& value)
+	{
+		auto fillch = s.fill();
+		auto width = s.width();
+		s << value.get_integral() << ".";
+		s.fill('0');
+		s.width(value.m_dps);
 		s << value.get_fractional();
 		s.width(width);
 		s.fill(fillch);

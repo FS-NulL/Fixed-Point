@@ -368,26 +368,26 @@ namespace FixedPoint
 		}
 
 		// Set the integral part, clears the fractional component
-		inline void set_integral(MyType value)
+		inline void set_integral(const MyType value)
 		{
 			m_Value = details::Factor<dps>::value * value;
 		}
 
 		// Sets the integral part, keeps the fractional component
-		inline void append_integral(MyType value)
+		inline void append_integral(const MyType value)
 		{
 			m_Value = (m_Value % details::Factor<dps>::value) +
 				details::Factor<dps>::value * value;
 		}
 
 		// Sets the fractional part, clears the integral component
-		inline void set_fractional(MyType value)
+		inline void set_fractional(const MyType value)
 		{
 			m_Value = value % details::Factor<dps>::value;
 		}
 
 		// Sets the fractional part, keeps the integral component
-		inline void append_fractional(MyType value)
+		inline void append_fractional(const MyType value)
 		{			
 			m_Value = (m_Value / details::Factor<dps>::value)
 				* details::Factor<dps>::value 
@@ -432,7 +432,7 @@ namespace FixedPoint
 		int m_dps;
 
 		template<size_t N>
-		RTFixed(Fixed<N, MyType>& f)
+		RTFixed(const Fixed<N, MyType>& f)
 			: m_Value(f.m_Value)
 			, m_dps(f.get_dp())
 		{ }

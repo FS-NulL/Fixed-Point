@@ -741,6 +741,30 @@ namespace FixedPoint
 		return temp;
 	}
 
+	template<size_t dps, typename T>
+	inline int operator +=(const int a, const Fixed<dps, T>& b) {
+		return static_cast<int>(a + (b.m_Value / details::Factor<dps>::value));
+	}
+
+	template<size_t dps, typename T>
+	inline int operator -=(const int a, const Fixed<dps, T>& b) {
+		return static_cast<int>(a + (b.m_Value / details::Factor<dps>::value));
+	}
+
+	template<size_t dps, typename T>
+	inline int operator *=(const int a, const Fixed<dps, T>& b) {
+		return static_cast<int>((a * b.m_Value) / details::Factor<dps>::value));
+	}
+
+	template<size_t dps, typename T>
+	inline int operator /=(const int a, const Fixed<dps, T>& b) {
+		return static_cast<int>(((a * details::Factor<dps>::value) / b.m_Value)));
+	}
+
+
+
+
+
 
 	template <size_t N, typename intfmt>
 	std::ostream& operator<<(std::ostream& s, const Fixed<N, intfmt>& value)

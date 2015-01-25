@@ -802,12 +802,14 @@ namespace FixedPoint
 	template <typename T>
 	std::ostream& operator<<(std::ostream& s, const RTFixed<T>& value)
 	{
+		int mul = (value.m_Value < 0) ? -1 : 1;
+		if ((value.m_Value < 0)) s << "-";
 		auto fillch = s.fill();
 		auto width = s.width();
-		s << value.get_integral() << ".";
+		s << value.get_integral() * mul << ".";
 		s.fill('0');
 		s.width(value.m_dps);
-		s << value.get_fractional();
+		s << value.get_fractional() * mul;
 		s.width(width);
 		s.fill(fillch);
 		return s;

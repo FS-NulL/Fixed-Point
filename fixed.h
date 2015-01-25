@@ -753,13 +753,40 @@ namespace FixedPoint
 
 	template<size_t dps, typename T>
 	inline int operator *=(const int a, const Fixed<dps, T>& b) {
-		return static_cast<int>((a * b.m_Value) / details::Factor<dps>::value));
+		return static_cast<int>((a * b.m_Value) / details::Factor<dps>::value);
 	}
 
 	template<size_t dps, typename T>
 	inline int operator /=(const int a, const Fixed<dps, T>& b) {
-		return static_cast<int>(((a * details::Factor<dps>::value) / b.m_Value)));
+		return static_cast<int>(((a * details::Factor<dps>::value) / b.m_Value));
 	}
+
+	template<size_t dps, typename T>
+	inline bool operator ==(const int a, const Fixed<dps, T>& b) {
+		return (a * details::Factor<dps>::value) == b.m_Value;
+	}
+
+	template<size_t dps, typename T>
+	inline bool operator >(const int a, const Fixed<dps, T>& b) {
+		return (a * details::Factor<dps>::value) > b.m_Value;
+	}
+
+	template<size_t dps, typename T>
+	inline bool operator <(const int a, const Fixed<dps, T>& b) {
+		return (a * details::Factor<dps>::value) < b.m_Value;
+	}
+
+	template<size_t dps, typename T>
+	inline bool operator >=(const int a, const Fixed<dps, T>& b) {
+		return !((a * details::Factor<dps>::value) < b.m_Value);
+	}
+
+	template<size_t dps, typename T>
+	inline bool operator <=(const int a, const Fixed<dps, T>& b) {
+		return !((a * details::Factor<dps>::value) > b.m_Value);
+	}
+
+
 
 
 

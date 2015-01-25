@@ -90,7 +90,7 @@ namespace FixedPoint
 			}
 		}
 
-		namespace ops2
+		namespace ops
 		{
 
 			// add
@@ -467,7 +467,7 @@ namespace FixedPoint
 		}
 
 		Fixed() : m_Value(0) { }
-		Fixed(MyType v) : m_Value(v) { } // Required to be like this // TODO
+		Fixed(MyType v) : m_Value(v) { } // Required to be like this
 		Fixed(const Fixed<dps,MyType>& d) { m_Value = d.m_Value; }
 
 		template <size_t dps2> Fixed(const Fixed<dps2, MyType>& d)
@@ -487,7 +487,7 @@ namespace FixedPoint
 			Fixed<(dps > dps2 ? dps : dps2), typename details::wider::widest<MyType, T2>::type>
 			operator + (const Fixed<dps2,T2>& d) const
 		{
-			return details::ops2::add(*this,d);
+			return details::ops::add(*this,d);
 		}
 
 		template<size_t dps2, typename T2>
@@ -495,7 +495,7 @@ namespace FixedPoint
 			Fixed<(dps > dps2 ? dps : dps2), typename details::wider::widest<MyType, T2>::type>
 			operator - (const Fixed<dps2, T2>& d) const
 		{
-			return details::ops2::sub(*this, d);
+			return details::ops::sub(*this, d);
 		}
 
 		template<size_t dps2, typename T2>
@@ -537,43 +537,43 @@ namespace FixedPoint
 		template <size_t dps2, typename T2>
 		inline bool operator ==(const Fixed<dps2, T2>& d) const
 		{
-			return details::ops2::equal(*this, d);
+			return details::ops::equal(*this, d);
 		}
 
 		template <size_t dps2, typename T2>
 		inline bool operator >(const Fixed<dps2, T2>& d) const
 		{
-			return details::ops2::greater(*this, d);
+			return details::ops::greater(*this, d);
 		}
 
 		template <size_t dps2, typename T2>
 		inline bool operator <(const Fixed<dps2, T2>& d) const
 		{
-			return details::ops2::lesser(*this, d);
+			return details::ops::lesser(*this, d);
 		}
 
 		template <size_t dps2, typename T2>
 		inline bool operator >=(const Fixed<dps2, T2>& d) const
 		{
-			return !details::ops2::lesser(*this, d);
+			return !details::ops::lesser(*this, d);
 		}
 
 		template <size_t dps2, typename T2>
 		inline bool operator <=(const Fixed<dps2, T2>& d) const
 		{
-			return !details::ops2::greater(*this, d);
+			return !details::ops::greater(*this, d);
 		}
 
 		template <size_t dps2, typename T2>
 		inline Fixed<dps, MyType>& operator +=(const Fixed<dps2, T2>& d) 
 		{
-			return details::ops2::plusEqual(*this, d);
+			return details::ops::plusEqual(*this, d);
 		}
 
 		template <size_t dps2, typename T2>
 		inline Fixed<dps, MyType>& operator -=(const Fixed<dps2, T2>& d)
 		{
-			return details::ops2::minusEqual(*this, d);
+			return details::ops::minusEqual(*this, d);
 		}
 
 		template <size_t dps2, typename T2>
@@ -759,19 +759,10 @@ namespace FixedPoint
 	inline bool operator <=(const int a, const Fixed<dps, T>& b) {
 		return !((a * details::Factor<dps>::value) > b.m_Value);
 	}
-
-
-
-
-
-
-
-
+	
 	template <size_t N, typename intfmt>
 	std::ostream& operator<<(std::ostream& s, const Fixed<N, intfmt>& value)
 	{
-		// TODO: This doesn't handle -0.04 for example
-		// negative numbers are a problem here		
 		int mul = (value.m_Value < 0) ? -1 : 1;
 		if ((value.m_Value < 0)) s << "-";		
 		auto fillch = s.fill();

@@ -92,11 +92,6 @@ namespace FixedPoint
 
 		namespace ops2
 		{
-			// add base
-			// add dps1 == dps2
-			// add dps1 != dps2
-			// add dps1 >  dps2
-			// add dps1 <  dps2
 
 			// add
 			template <size_t dps1, size_t dps2, bool dps1_greater, typename T1, typename T2>
@@ -641,17 +636,6 @@ namespace FixedPoint
 			return *this;
 		}
 
-		// TODO: templatize all this code on dps dps2 T1(MyType) T2 
-		// Only for Fixed<> inputs
-		// then specialise on dps == dps2 
-		// and T1 == T2
-
-		// operators: 
-		// +  -  *  /  all operator on largest dp (and widest T), return largest + widest DONE
-		// += -= *= /= all operator on largest dp (and widest T), return largest + widest DONE
-		// == >  >= <  <= all operate on largest dp (width conversion is implicit) DONE
-
-
 		template <int decimalPlaces>
 		void round()
 		{
@@ -706,16 +690,6 @@ namespace FixedPoint
 		}
 
 	};
-
-	// TODO: external operator overloads
-	// int + Fixed
-	// float + Fixed
-	// double + fixed
-
-	// operators: 
-	// +  -  *  /  all operator on largest dp (and widest T), return largest + widest DONE
-	// += -= *= /= all operator on largest dp (and widest T), return largest + widest DONE
-	// == >  >= <  <= all operate on largest dp (width conversion is implicit) DONE
 
 	template<size_t dps, typename T>
 	inline Fixed<dps, T> operator + (const int a, const Fixed<dps, T>& b) {
@@ -846,6 +820,23 @@ namespace FixedPoint
 		s.width(width);
 		s.fill(fillch);
 		return s;
+	}
+
+	namespace FixedTypes
+	{
+		typedef Fixed<1, int> Fixed1i;
+		typedef Fixed<2, int> Fixed2i;
+		typedef Fixed<3, int> Fixed3i;
+		typedef Fixed<4, int> Fixed4i;
+		typedef Fixed<5, int> Fixed5i;
+		typedef Fixed<6, int> Fixed6i;
+
+		typedef Fixed<1, long long int> Fixed1ll;
+		typedef Fixed<2, long long int> Fixed2ll;
+		typedef Fixed<3, long long int> Fixed3ll;
+		typedef Fixed<4, long long int> Fixed4ll;
+		typedef Fixed<5, long long int> Fixed5ll;
+		typedef Fixed<6, long long int> Fixed6ll;
 	}
 
 

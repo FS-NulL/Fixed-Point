@@ -4,15 +4,22 @@
 #include <cstddef> // for size_t
 #include <iosfwd>
 
+// Fixed point classes
+// For storing decimal numbers with a fixed number of decimal places.
 namespace FixedPoint
 {
-	namespace details
+	// User configurable settings
+	namespace config
 	{
+		// Fixed's default internal storage type
+		// 32 or 64 bit ints are probable depending on platform
 		typedef long long int DefaultType;
 	}
 
-	template <size_t dps, typename MyType = details::DefaultType> struct Fixed;
+	// Fixed prototype
+	template <size_t dps, typename MyType = config::DefaultType> struct Fixed;
 
+	// Internal implementation 
 	namespace details
 	{
 		// Negative numbers crash the compiler by design
@@ -41,6 +48,8 @@ namespace FixedPoint
 
 		template<size_t a, size_t b> struct Max{ enum { value = (a>b ? a : b) }; };
 
+		// Gets the wider of two types
+		// Usage: wider::widest<T1, T2>::type
 		namespace wider
 		{
 			template<bool, typename T1, typename T2>
@@ -61,7 +70,6 @@ namespace FixedPoint
 
 		namespace ctors
 		{
-
 			template <size_t dps1, size_t dps2, bool dps1_greater, typename T1, typename T2>
 			struct scaleFixedImpl
 			{
@@ -442,10 +450,10 @@ namespace FixedPoint
 
 	}
 
-	template <size_t dps, typename MyType>
-	struct Fixed
+	// Stores a value with a fixed number of decimal places
+	template <size_t dps, typename MyType> struct Fixed
 	{
-		//typedef long long int MyType;
+		// Value is stored here
 		MyType m_Value;
 
 		// Constructors
@@ -470,17 +478,16 @@ namespace FixedPoint
 		Fixed(MyType v) : m_Value(v) { } // Required to be like this
 		Fixed(const Fixed<dps,MyType>& d) { m_Value = d.m_Value; }
 
-		template <size_t dps2> Fixed(const Fixed<dps2, MyType>& d)
-		{
-			// Convert to our dps format
-			details::ctors::scaleFixed(*this, d);
-		}
-
 		template <size_t dps2, typename T> Fixed(const Fixed<dps2, T>& d)
 		{
 			// Convert to our dps format and out internal format
 			details::ctors::scaleFixed(*this, d);
 		}
+
+
+		// Operator Overloads
+
+		// Fixed<> Inputs
 
 		template<size_t dps2, typename T2>
 		inline 
@@ -776,8 +783,10 @@ namespace FixedPoint
 		return s;
 	}
 
-	template<typename MyType = details::DefaultType>
-	struct RTFixed
+	// Stores a fixed point value whos number of decimal places in not known
+	// at compile time. Useful for example if a function needs to return
+	// either a Fixed<2> or Fixed<3>.
+	template<typename MyType = config::DefaultType>	struct RTFixed
 	{
 		MyType m_Value;
 		size_t m_dps;

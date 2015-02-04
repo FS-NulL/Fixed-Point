@@ -26,7 +26,7 @@ namespace FixedPoint
 		template<int N> struct Factor	 { enum { value = (Factor<N - 1>::value * 10) }; };
 		template<>		struct Factor< 0>{ enum { value = 1 }; };
 
-		int RTFactor(size_t dp)
+		static int RTFactor(size_t dp)
 		{
 			// 0 - 9 Are the only valid options
 			// > 9 Overflows int return type

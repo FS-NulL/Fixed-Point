@@ -841,6 +841,15 @@ namespace FixedPoint
 		typedef Fixed<6, long long int> Fixed6ll;
 	}
 
+	namespace Utils
+	{
+		template <size_t dps, typename T>
+		Fixed<dps, T> MkFxd(T t)
+		{
+			return Fixed<dps,T>(t);
+		}
+	}
+
 
 }
 

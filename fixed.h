@@ -846,7 +846,7 @@ namespace FixedPoint
 		// Make a fixed point number using the same internal storage type
 		// of the passed in Fixed value
 		template <size_t dps, size_t dps2, typename T>
-		Fixed<dps, T> MkFxd(Fixed<dps2, T> t)
+		inline Fixed<dps, T> MkFxd(Fixed<dps2, T> t)
 		{
 			return Fixed<dps, T>(t);
 		}
@@ -854,7 +854,7 @@ namespace FixedPoint
 		// Make a fixed point number using internal storage type
 		// that matches the argument type
 		template <size_t dps, typename T>
-		Fixed<dps, T> MkFxd(T t)
+		inline Fixed<dps, T> MkFxd(T t)
 		{
 			return Fixed<dps,T>(t);
 		}

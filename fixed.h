@@ -104,7 +104,7 @@ namespace FixedPoint
 			// add
 			template <size_t dps1, size_t dps2, bool dps1_greater, typename T1, typename T2>
 			struct addImpl {
-				inline static Fixed<(dps1 > dps2 ? dps1 : dps2)>
+				inline static Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
 					f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
 					return (b.m_Value + Fixed<dps2, T2>(a).m_Value);
 				}
@@ -112,7 +112,7 @@ namespace FixedPoint
 
 			template <size_t dps1, size_t dps2, typename T1, typename T2>
 			struct addImpl < dps1, dps2, true, T1, T2>{
-				inline static Fixed<(dps1 > dps2 ? dps1 : dps2)>
+				inline static Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
 					f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
 					return (Fixed<dps1, T1>(b).m_Value + a.m_Value);
 				}
@@ -154,7 +154,7 @@ namespace FixedPoint
 			// sub
 			template <size_t dps1, size_t dps2, bool dps1_greater, typename T1, typename T2>
 			struct subImpl {
-				inline static Fixed<(dps1 > dps2 ? dps1 : dps2)>
+				inline static Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
 					f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
 					return (Fixed<dps2, T2>(a).m_Value - b.m_Value);
 				}
@@ -162,7 +162,7 @@ namespace FixedPoint
 
 			template <size_t dps1, size_t dps2, typename T1, typename T2>
 			struct subImpl < dps1, dps2, true, T1, T2>{
-				inline static Fixed<(dps1 > dps2 ? dps1 : dps2)>
+				inline static Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
 					f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
 					return (a.m_Value - Fixed<dps1, T1>(b).m_Value);
 				}

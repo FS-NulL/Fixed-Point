@@ -639,35 +639,41 @@ namespace FixedPoint
         // template with enable_if is_integral
         // so all integer types can be used
 
-        inline Fixed<dps, MyType> operator *(const int v) const { return m_Value * v; }
-        Fixed<dps, MyType> operator /(const int v) const
+        
+        template<typename T> inline Fixed<dps, MyType> operator *(T v) const
+        { 
+            return Utils::MkFxd<dps, MyType>(m_Value * v);
+        }
+        template<typename T> Fixed<dps, MyType> operator /(T v) const
         {
             auto temp = ((m_Value * 10) / v);
             if (temp >= 0) temp += 5; else temp -= 5;
-            return temp / 10;
+            return Utils::MkFxd<dps, MyType>(temp / 10);
         }
-        inline Fixed<dps, MyType> operator +(const int v) const
+        template<typename T> inline Fixed<dps, MyType> operator +(T v) const
         {
-            return m_Value + v * details::Factor<dps>::value;
+            return Utils::MkFxd<dps, MyType>
+                (m_Value + v * details::Factor<dps>::value);
         }
-        inline Fixed<dps, MyType> operator -(const int v) const
+        template<typename T> inline Fixed<dps, MyType> operator -(T v) const
         {
-            return m_Value - v * details::Factor<dps>::value;
+            return Utils::MkFxd<dps, MyType>
+                (m_Value - v * details::Factor<dps>::value);
         }
 
-        inline Fixed<dps, MyType>& operator +=(const int v)
+        template<typename T> inline Fixed<dps, MyType>& operator +=(T v)
         {
             m_Value += v * details::Factor<dps>::value; return *this;
         }
-        inline Fixed<dps, MyType>& operator -=(const int v)
+        template<typename T> inline Fixed<dps, MyType>& operator -=(T v)
         {
             m_Value -= v * details::Factor<dps>::value; return *this;
         }
-        inline Fixed<dps, MyType>& operator *=(const int v) 
+        template<typename T> inline Fixed<dps, MyType>& operator *=(T v)
         { 
             m_Value *= v; return *this; 
         }
-        Fixed<dps, MyType>& operator /=(const int v)
+        template<typename T> Fixed<dps, MyType>& operator /=(T v)
         {
             auto temp = ((m_Value * 10) / v);
             if (temp >= 0) temp += 5; else temp -= 5;

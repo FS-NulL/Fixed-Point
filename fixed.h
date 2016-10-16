@@ -83,7 +83,7 @@ namespace FixedPoint
             {
                 inline static void f(Fixed<dps1,T1>& a, const Fixed<dps2,T2>& b) {
                     // Round and scale down
-                    auto f = details::Factor<dps2 - dps1>::value;
+                    const auto f = details::Factor<dps2 - dps1>::value;
                     if (b.m_Value >= 0) 
                          a.m_Value = static_cast<T1>((b.m_Value + f / 2) / f);
                     else a.m_Value = static_cast<T1>((b.m_Value - f / 2) / f);
@@ -94,7 +94,7 @@ namespace FixedPoint
             struct scaleFixedImpl < dps1, dps2, true, T1, T2 >
             {
                 inline static void f(Fixed<dps1,T1>& a, const Fixed<dps2,T2>& b) {
-                    auto fac = details::Factor<dps1 - dps2>::value;
+                    const auto fac = details::Factor<dps1 - dps2>::value;
                     a.m_Value = static_cast<T1>(b.m_Value * fac);
                 }
             };
@@ -535,7 +535,7 @@ namespace FixedPoint
             operator *(const Fixed<dps2, T2>& d)
         {
             auto temp = m_Value * d.m_Value;
-            auto f = details::Factor<(dps <= dps2 ? dps : dps2)>::value;
+            const auto f = details::Factor<(dps <= dps2 ? dps : dps2)>::value;
             if (temp >= 0) temp += f / 2; else temp -= f / 2;
             return Utils::MkFxd<(dps > dps2 ? dps : dps2), 
                 typename details::wider::widest<MyType, T2>::type>
@@ -742,26 +742,29 @@ namespace FixedPoint
 
     template<size_t dps, typename T>
     inline Fixed<dps, T> operator + (const int a, const Fixed<dps, T>& b) {
-        return (a * details::Factor<dps>::value) + b.m_Value;
+        return Utils::MkFxd<dps,T>
+            ((a * details::Factor<dps>::value) + b.m_Value);
     }
 
     template<size_t dps, typename T>
     inline Fixed<dps, T> operator - (const int a, const Fixed<dps, T>& b) {
-        return (a * details::Factor<dps>::value) - b.m_Value;
+        return Utils::MkFxd<dps, T>
+            ((a * details::Factor<dps>::value) - b.m_Value);
     }
 
     template<size_t dps, typename T>
     inline Fixed<dps, T> operator * (const int a, const Fixed<dps, T>& b) {
-        return a * b.m_Value;
+        return Utils::MkFxd<dps, T>(a * b.m_Value);
     }
 
     template<size_t dps, typename T>
-    inline Fixed<dps, T> operator / (const int a, const Fixed<dps, T>& b) {		
-        T temp = a * details::Factor<dps+1>::value;
+    inline Fixed<dps, T> operator / (const int a, const Fixed<dps, T>& b) {
+        // NOTE: This large factor is quite dangerous
+        T temp = ((T)a) * details::Factor<2*dps+1>::value;
         temp /= b.m_Value;
         if (temp >= 0) temp += 5; else temp -= 5;
         temp /= 10;		
-        return temp;
+        return Utils::MkFxd<dps, T>(temp);
     }
 
     template<size_t dps, typename T>

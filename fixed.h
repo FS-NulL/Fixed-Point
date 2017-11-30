@@ -21,7 +21,7 @@ namespace FixedPoint
     namespace Utils
     {
         template <size_t dpsF, typename TF>
-        Fixed<dpsF, TF> MkFxd(TF t);
+        constexpr Fixed<dpsF, TF> MkFxd(TF t);
     }
 
     // Fixed prototype
@@ -81,28 +81,35 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, bool dps1_greater, typename T1, typename T2>
             struct scaleFixedImpl
             {
-                inline static void f(Fixed<dps1,T1>& a, const Fixed<dps2,T2>& b) {
-                    // Round and scale down
-                    const auto f = details::Factor<dps2 - dps1>::value;
-                    if (b.m_Value >= 0) 
-                         a.m_Value = static_cast<T1>((b.m_Value + f / 2) / f);
-                    else a.m_Value = static_cast<T1>((b.m_Value - f / 2) / f);
+                inline static constexpr T1 f(const T2 in)
+                {
+                    // round and scale input down
+                    return  static_cast<T1>
+                        ((in >= 0) ?
+                        ((in + (details::Factor<dps2 - dps1>::value / 2)) 
+                            / details::Factor<dps2 - dps1>::value)
+                        :
+                        ((in + (details::Factor<dps2 - dps1>::value / 2))
+                            / details::Factor<dps2 - dps1>::value)
+                        );
                 }
             };
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct scaleFixedImpl < dps1, dps2, true, T1, T2 >
             {
-                inline static void f(Fixed<dps1,T1>& a, const Fixed<dps2,T2>& b) {
-                    const auto fac = details::Factor<dps1 - dps2>::value;
-                    a.m_Value = static_cast<T1>(b.m_Value * fac);
+                inline static constexpr T1 f(const T2 in)
+                {
+                    // scale up
+                    return static_cast<T1>
+                        (in * details::Factor<dps1 - dps2>::value);
                 }
             };
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
-            inline void scaleFixed(Fixed<dps1,T1>& a, const Fixed<dps2,T2>& b) {
-                //a.m_Value = 0;
-                scaleFixedImpl<dps1, dps2, (dps1 >= dps2), T1, T2>::f(a, b);
+            inline static constexpr T1 scaleFixed(const T2 in)
+            {
+                return scaleFixedImpl<dps1, dps2, (dps1>=dps2), T1, T2>::f(in);
             }
         }
 
@@ -112,7 +119,7 @@ namespace FixedPoint
             // add
             template <size_t dps1, size_t dps2, bool dps1_greater, typename T1, typename T2>
             struct addImpl {
-                inline static Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
+                inline static constexpr Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
                     return Utils::MkFxd<(dps1 > dps2 ? dps1 : dps2), 
                         typename details::wider::widest<T1, T2>::type >
@@ -122,7 +129,7 @@ namespace FixedPoint
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct addImpl < dps1, dps2, true, T1, T2>{
-                inline static Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
+                inline static constexpr Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
                     return Utils::MkFxd<(dps1 > dps2 ? dps1 : dps2), 
                         typename details::wider::widest<T1, T2>::type>
@@ -133,7 +140,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, bool dps_equal, typename T1, typename T2>
             struct addImplDpCompare
             {
-                inline static 
+                inline static constexpr
                     Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {
@@ -145,7 +152,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct addImplDpCompare < dps1, dps2, true, T1, T2 >
             {
-                inline static
+                inline static constexpr
                     Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {
@@ -156,7 +163,7 @@ namespace FixedPoint
             };
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
-            inline
+            inline static constexpr
                 Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
                 add(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
             {
@@ -166,7 +173,7 @@ namespace FixedPoint
             // sub
             template <size_t dps1, size_t dps2, bool dps1_greater, typename T1, typename T2>
             struct subImpl {
-                inline static Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
+                inline static constexpr Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
                     return Utils::MkFxd<(dps1 > dps2 ? dps1 : dps2), 
                         typename details::wider::widest<T1, T2>::type>
@@ -176,7 +183,7 @@ namespace FixedPoint
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct subImpl < dps1, dps2, true, T1, T2>{
-                inline static Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
+                inline static constexpr Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
                     return Utils::MkFxd<(dps1 > dps2 ? dps1 : dps2), 
                         typename details::wider::widest<T1, T2>::type>
@@ -187,7 +194,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, bool dps_equal, typename T1, typename T2>
             struct subImplDpCompare
             {
-                inline static
+                inline static constexpr
                     Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {
@@ -199,7 +206,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct subImplDpCompare < dps1, dps2, true, T1, T2 >
             {
-                inline static
+                inline static constexpr
                     Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {
@@ -212,7 +219,7 @@ namespace FixedPoint
             };
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
-            inline
+            inline static constexpr
                 Fixed<(dps1 > dps2 ? dps1 : dps2), typename details::wider::widest<T1, T2>::type>
                 sub(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
             {
@@ -222,7 +229,7 @@ namespace FixedPoint
             // equal
             template <size_t dps1, size_t dps2, bool dps1_greater, typename T1, typename T2>
             struct eqImpl {
-                inline static bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2> & b)
+                inline static constexpr bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2> & b)
                 {	//dps1 < dps2
                     return Fixed<details::Max<dps1, dps2>::value>(a).m_Value
                         == b.m_Value;
@@ -231,7 +238,7 @@ namespace FixedPoint
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct eqImpl < dps1, dps2, true, T1, T2>{
-                inline static bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
+                inline static constexpr bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {	//dps1 > dps2
                     return a.m_Value ==
                         Fixed<details::Max<dps1, dps2>::value>(b).m_Value;
@@ -241,7 +248,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, bool dps_equal, typename T1, typename T2>
             struct eqImplDpCompare
             {
-                inline static bool
+                inline static constexpr bool
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {	// dps1 != dps2
                     return eqImpl<dps1, dps2, (dps1 > dps2), T1, T2>::f(a, b);
@@ -251,7 +258,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct eqImplDpCompare < dps1, dps2, true, T1, T2 >
             {
-                inline static bool 
+                inline static constexpr bool
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {
                     // dps1 == dps2 - do work right here
@@ -260,7 +267,7 @@ namespace FixedPoint
             };
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
-            inline bool equal(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
+            inline static constexpr bool equal(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
                 
                 return eqImplDpCompare <dps1, dps2, dps1 == dps2, T1, T2 > ::f(a, b);
             }
@@ -268,7 +275,7 @@ namespace FixedPoint
             // greater
             template <size_t dps1, size_t dps2, bool dps1_greater, typename T1, typename T2>
             struct gtImpl {
-                inline static bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2> & b)
+                inline static constexpr bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2> & b)
                 {	//dps1 < dps2
                     return Fixed<details::Max<dps1, dps2>::value>(a).m_Value
                         > b.m_Value;
@@ -277,7 +284,7 @@ namespace FixedPoint
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct gtImpl < dps1, dps2, true, T1, T2>{
-                inline static bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
+                inline static constexpr bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {	//dps1 > dps2
                     return a.m_Value >
                         Fixed<details::Max<dps1, dps2>::value>(b).m_Value;
@@ -287,7 +294,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, bool dps_equal, typename T1, typename T2>
             struct gtImplDpCompare
             {
-                inline static bool
+                inline static constexpr bool
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {	// dps1 != dps2
                     return gtImpl<dps1, dps2, (dps1 > dps2), T1, T2>::f(a, b);
@@ -297,7 +304,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct gtImplDpCompare < dps1, dps2, true, T1, T2 >
             {
-                inline static bool
+                inline static constexpr bool
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {
                     // dps1 == dps2 - do work right here
@@ -306,7 +313,7 @@ namespace FixedPoint
             };
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
-            inline bool greater(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
+            inline static constexpr bool greater(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
 
                 return gtImplDpCompare <dps1, dps2, dps1 == dps2, T1, T2 > ::f(a, b);
             }
@@ -314,7 +321,7 @@ namespace FixedPoint
             // lesser
             template <size_t dps1, size_t dps2, bool dps1_greater, typename T1, typename T2>
             struct ltImpl {
-                inline static bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2> & b)
+                inline static constexpr bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2> & b)
                 {	//dps1 < dps2
                     return Fixed<details::Max<dps1, dps2>::value>(a).m_Value
                         < b.m_Value;
@@ -323,7 +330,7 @@ namespace FixedPoint
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct ltImpl < dps1, dps2, true, T1, T2>{
-                inline static bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
+                inline static constexpr bool f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {	//dps1 > dps2
                     return a.m_Value <
                         Fixed<details::Max<dps1, dps2>::value>(b).m_Value;
@@ -333,7 +340,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, bool dps_equal, typename T1, typename T2>
             struct ltImplDpCompare
             {
-                inline static bool
+                inline static constexpr bool
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {	// dps1 != dps2
                     return ltImpl<dps1, dps2, (dps1 > dps2), T1, T2>::f(a, b);
@@ -343,7 +350,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct ltImplDpCompare < dps1, dps2, true, T1, T2 >
             {
-                inline static bool
+                inline static constexpr bool
                     f(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {
                     // dps1 == dps2 - do work right here
@@ -352,7 +359,7 @@ namespace FixedPoint
             };
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
-            inline bool lesser(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
+            inline static constexpr bool lesser(const Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
 
                 return ltImplDpCompare <dps1, dps2, dps1 == dps2, T1, T2 > ::f(a, b);
             }
@@ -374,7 +381,7 @@ namespace FixedPoint
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct plusEqImpl < dps1, dps2, true, T1, T2>{
-                inline static Fixed<dps1, T1>&
+                inline static constexpr Fixed<dps1, T1>&
                     f(Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {	//dps1 > dps2
                     a.m_Value += static_cast<T1>(b.m_Value *
@@ -386,7 +393,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, bool dps_equal, typename T1, typename T2>
             struct plusEqImplDpCompare
             {
-                inline static Fixed<dps1, T1>&
+                inline static constexpr Fixed<dps1, T1>&
                     f(Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {	// dps1 != dps2
                     return plusEqImpl<dps1, dps2, (dps1 > dps2), T1, T2>::f(a, b);
@@ -396,7 +403,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, typename T1, typename T2>
             struct plusEqImplDpCompare < dps1, dps2, true, T1, T2 >
             {
-                inline static Fixed<dps1, T1>&
+                inline static constexpr Fixed<dps1, T1>&
                     f(Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {
                     // dps1 == dps2 - do work right here
@@ -406,7 +413,7 @@ namespace FixedPoint
             };
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
-            inline Fixed<dps1, T1>& plusEqual(Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
+            inline static constexpr Fixed<dps1, T1>& plusEqual(Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
 
                 return plusEqImplDpCompare <dps1, dps2, dps1 == dps2, T1, T2 > ::f(a, b);
             }
@@ -440,7 +447,7 @@ namespace FixedPoint
             template <size_t dps1, size_t dps2, bool dps_equal, typename T1, typename T2>
             struct minusEqImplDpCompare
             {
-                inline static Fixed<dps1, T1>&
+                inline static constexpr Fixed<dps1, T1>&
                     f(Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b)
                 {	// dps1 != dps2
                     return minusEqImpl<dps1, dps2, (dps1 > dps2), T1, T2>::f(a, b);
@@ -460,7 +467,7 @@ namespace FixedPoint
             };
 
             template <size_t dps1, size_t dps2, typename T1, typename T2>
-            inline Fixed<dps1, T1>& minusEqual(Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
+            inline static constexpr Fixed<dps1, T1>& minusEqual(Fixed<dps1, T1>& a, const Fixed<dps2, T2>& b) {
 
                 return minusEqImplDpCompare <dps1, dps2, dps1 == dps2, T1, T2 > ::f(a, b);
             }
@@ -494,20 +501,18 @@ namespace FixedPoint
 
     private:
         struct InternalValue {};
-        Fixed(MyType v, InternalValue) : m_Value(v) { }
+        constexpr Fixed(MyType v, InternalValue) : m_Value(v) { }
 
     public:
 
-        Fixed() : m_Value(0) { }
-        Fixed(MyType v)
-            : m_Value(v * details::Factor<dps>::value) { } 
-        Fixed(const Fixed<dps,MyType>& d) { m_Value = d.m_Value; }
+        constexpr Fixed() : m_Value(0) { }
+        constexpr Fixed(MyType v) : m_Value(v * details::Factor<dps>::value) {} 
+        constexpr Fixed(const Fixed<dps,MyType>& d) : m_Value(d.m_Value) {}
 
-        template <size_t dps2, typename T> Fixed(const Fixed<dps2, T>& d)
-        {
-            // Convert to our dps format and out internal format
-            details::ctors::scaleFixed(*this, d);
-        }
+        template <size_t dps2, typename T> 
+        constexpr Fixed(const Fixed<dps2, T>& d)
+            : m_Value(details::ctors::scaleFixed<dps,dps2,MyType,T>(d.m_Value))
+        { }
 
 
         // Operator Overloads
@@ -515,7 +520,7 @@ namespace FixedPoint
         // Fixed<> Inputs
 
         template<size_t dps2, typename T2>
-        inline 
+        inline constexpr
             Fixed<(dps > dps2 ? dps : dps2), typename details::wider::widest<MyType, T2>::type>
             operator + (const Fixed<dps2,T2>& d) const
         {
@@ -523,7 +528,7 @@ namespace FixedPoint
         }
 
         template<size_t dps2, typename T2>
-        inline
+        inline constexpr
             Fixed<(dps > dps2 ? dps : dps2), typename details::wider::widest<MyType, T2>::type>
             operator - (const Fixed<dps2, T2>& d) const
         {
@@ -599,7 +604,7 @@ namespace FixedPoint
         }
 
         template <size_t dps2, typename T2>
-        inline Fixed<dps, MyType>& operator +=(const Fixed<dps2, T2>& d) 
+        inline Fixed<dps, MyType>& operator +=(const Fixed<dps2, T2>& d)
         {
             return details::ops::plusEqual(*this, d);
         }
@@ -891,7 +896,7 @@ namespace FixedPoint
         // Make a fixed point number using the same internal storage type
         // of the passed in Fixed value
         template <size_t dps, size_t dps2, typename T>
-        inline Fixed<dps, T> MkFxd(Fixed<dps2, T> t)
+        inline constexpr Fixed<dps, T> MkFxd(Fixed<dps2, T> t)
         {
             return Fixed<dps, T>(t);
         }
@@ -899,10 +904,23 @@ namespace FixedPoint
         // Make a fixed point number using internal storage type
         // that matches the argument type
         template <size_t dps, typename T>
-        inline Fixed<dps, T> MkFxd(T t)
+        inline constexpr Fixed<dps, T> MkFxd(T t)
         {
             return Fixed<dps,T>(t, Fixed<dps,T>::InternalValue());
         }
+    }
+
+    namespace UserDefinedLiterals
+    {
+        constexpr auto operator "" _fxd1(long double lld) { return ::FixedPoint::Utils::MkFxd<1>((int)(lld * 10        )); }
+        constexpr auto operator "" _fxd2(long double lld) { return ::FixedPoint::Utils::MkFxd<2>((int)(lld * 100       )); }
+        constexpr auto operator "" _fxd3(long double lld) { return ::FixedPoint::Utils::MkFxd<3>((int)(lld * 1000      )); }
+        constexpr auto operator "" _fxd4(long double lld) { return ::FixedPoint::Utils::MkFxd<4>((int)(lld * 10000     )); }
+        constexpr auto operator "" _fxd5(long double lld) { return ::FixedPoint::Utils::MkFxd<5>((int)(lld * 100000    )); }
+        constexpr auto operator "" _fxd6(long double lld) { return ::FixedPoint::Utils::MkFxd<6>((int)(lld * 1000000   )); }
+        constexpr auto operator "" _fxd7(long double lld) { return ::FixedPoint::Utils::MkFxd<7>((int)(lld * 10000000  )); }
+        constexpr auto operator "" _fxd8(long double lld) { return ::FixedPoint::Utils::MkFxd<8>((int)(lld * 100000000 )); }
+        constexpr auto operator "" _fxd9(long double lld) { return ::FixedPoint::Utils::MkFxd<9>((int)(lld * 1000000000)); }
     }
 
 
